@@ -75,7 +75,7 @@ f (2, "hi");
 f (2, "hi", 0.75);
 ```
 
-It's even possible to define methods with real variable-length argument lists (`varargs`) like `stdout.printf()`, 
+It's even possible to define methods with real variable-length argument lists (`varargs`) like `stdout.printf ()`, 
 although not necessarily recommended.  You will learn how to do that later.  
 Vala performs a basic nullability check on the method parameters and return values.  
 If it is allowable for a method parameter or a return value to be `null`, the type symbol should be postfixed with a `?` 
@@ -133,7 +133,7 @@ class Foo {
 ```
 More samples in the [Delegates section of the Vala Reference Manual](https://gnome.pages.gitlab.gnome.org/vala/manual/delegates.html).  
 
-## 2.7.3. Anonymous Methods / Closures
+## 2.7.3. Anonymous Methods / Closures (Lambda Expressions) {#_2-7-3-anonymous-methods-closures}
 
 ```vala     
 (a) => { stdout.printf ("%d\n", a); }
@@ -152,7 +152,7 @@ delegate void PrintIntFunc (int a);
 
 void main () {
     PrintIntFunc p1 = (a) => { stdout.printf ("%d\n", a);};
-    p1(10);
+    p1 (10);
 
     // Curly braces are optional if the body contains only one statement:
     PrintIntFunc p2 = (a) => stdout.printf ("%d\n", a);
@@ -189,7 +189,7 @@ IntOperation curried_add (int a) {
 }     
 
 void main () {        
-    stdout.printf ("2 + 4 = %d\n", curried_add (2)(4));    
+    stdout.printf ("2 + 4 = %d\n", curried_add (2) (4));    
 }  
 ```
 
@@ -245,9 +245,9 @@ required.
 
 ```vala
 struct Color {
-    public double red;
-    public double green;
-    public double blue;
+    double red;
+    double green;
+    double blue;
 }
 ```
 
@@ -272,12 +272,119 @@ var c5 = Color () {
 };
 ```
 
+Structs can have methods: 
+
+```vala
+struct Point {
+    public double x;
+    public double y;
+
+    public double distance_to (Point other) {
+        return Math.sqrt ((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+    }
+}
+
+void main () {
+    Point p1 = { 1.0, 2.0 };
+    Point p2 = { 4.0, 6.0 };
+
+    p1.distance_to (p2);  // returns 5.0
+}
+```
+
 Structs are stack/inline allocated and copied on assignment.
 
 To define an array of structs, please see the
 [FAQ](../../../../faq#how-do-i-create-an-array-of-structs)
 
-## 2.7.6. Classes
+
+## 2.7.6. Enums
+
+Enums are a way to define a set of named integer constants. They are useful for defining a set of related values that are not necessarily sequential. For example, the following code defines an enum named `EnumName` with three values:
+
+```vala
+enum EnumName {
+    VALUE1,
+    VALUE2,
+    VALUE3
+}
+```
+
+The values of the enum are accessed by the name of the enum followed by a period and the name of the value, e.g. `EnumName.VALUE1`.
+
+
+An enum can contain methods:
+
+```vala
+enum EnumName {
+    VALUE1,
+    VALUE2,
+    VALUE3;
+
+    public unowned string to_string () {
+        switch (this) {
+            case VALUE1: return "Value 1";
+            case VALUE2: return "Value 2";
+            case VALUE3: return "Value 3";
+            default: return "Unknown";
+        }
+    }
+}
+
+void main () {
+    print (EnumName.VALUE1.to_string ());  // prints "Value 1"
+    print (EnumName.VALUE2.to_string ());  // prints "Value 2"
+    print (EnumName.VALUE3.to_string ());  // prints "Value 3"
+}
+```
+
+
+::: info Note
+
+An enum can be declared inside a class
+
+:::
+
+
+## 2.7.7. Flags
+
+Enums can be used like flags by using the `[Flags]` attribute on the enum definition.
+This allows you to combine the values using the `+` operator and check if a value is set using the `in` operator.
+
+For example:
+
+```vala
+[Flags]
+enum MyFlags {
+    FLAG1,
+    FLAG2,
+    FLAG3
+}
+
+void main () {
+    MyFlags flags;
+
+    flags = MyFlags.FLAG1 + MyFlags.FLAG3;
+
+    if (MyFlags.FLAG1 in flags)
+        print ("FLAG1 is set");
+    if (MyFlags.FLAG2 in flags)
+        print ("FLAG2 is set");
+    if (MyFlags.FLAG3 in flags)
+        print ("FLAG3 is set");
+}
+```
+
+| Operator | Description |
+|----------|-------------|
+| `+=` | Adds flags to this |
+| `-=` | Removes flags from this |
+| `+` | Combines two flags. |
+| `-` | Subtracts the flags. |
+| `in` | Checks if a flag is set. |
+
+
+## 2.7.8. Classes
 
 ```vala
 class ClassName : SuperClassName, InterfaceName {
@@ -289,7 +396,9 @@ instances of classes are heap allocated. There is much more syntax
 related to classes, which is discussed more fully in the section about
 object-oriented programming.
 
-## 2.7.7. Interfaces
+[3. Object Oriented Programming](../03-00-object-oriented-programming) and [3.1. Basics](../03-00-object-oriented-programming/03-01-basics)
+
+## 2.7.9. Interfaces
 
 ```vala
 interface InterfaceName : SuperInterfaceName {

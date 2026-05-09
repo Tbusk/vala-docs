@@ -66,10 +66,10 @@ display_jpeg.begin ("test.jpg", (obj, res) => {
 });
 ```
 
-Both forms starts the async method running with the given arguments. The
+Both forms start the async method running with the given arguments. The
 second form in addition registers an `AsyncReadyCallback` which is
 executed when the method finishes. The callback takes a source object,
-`obj`, and an instance of GAyncResult, `res`, as arguments. In the
+`obj`, and an instance of `GAsyncResult`, `res`, as arguments. In the
 callback the `.end ()` method should be called to receive the return
 value of the asynchronous method if it has one. If the async method can
 throw an exception, the `.end ()` call is where the exception arrives and
@@ -160,7 +160,54 @@ the called method which runs until its first `yield` and then drops back
 to the calling method, which completes the `yield` statement itself, and
 then gives back control to its own caller.
 
-## 4.8.1. Examples
+## 4.8.1. Thread with Async Methods
+
+An async method may be used to control a background thread.
+
+In the example below, `supra_calculator` starts a worker thread that performs a simulated calculation and sleeps for `ms` milliseconds. When the thread finishes, it schedules `supra_calculator.callback` with `Idle.add`, so the async method can resume after the `yield`. Meanwhile, `main` keeps printing `Hi!` every second from a `Timeout` callback. After `yield supra_calculator (4000)` completes, the joined result is printed.
+
+The `yield` keyword pauses execution of the async method so other code (such as the timeout) can run; execution later resumes at the point after the `yield`.
+
+```vala
+async int supra_calculator (int ms) {
+    var thread = new Thread<int> (null, () => {
+        int n = 0;
+        // make a hard calculation:
+        n = 12 * ms;
+        Thread.usleep (ms * 1000);
+        Idle.add (supra_calculator.callback);
+        return n;
+    });
+    yield;
+
+    var result = thread.join ();
+    return result;
+}
+
+async void main () {
+
+    // Every second, print "Hi !"
+    Timeout.add (1000, () => {
+        print (@"Hi !\n");
+        return true;
+    });
+
+    int res = yield supra_calculator (4000);
+    print (@"result: $res\n");
+}
+```
+
+
+Example output:
+
+```text
+Hi !
+Hi !
+Hi !
+result: 48000
+```
+
+## 4.8.2. Examples
 
 See [Async Method Samples](../../../../sample-code/basics/async-samples) for examples of different
 ways that `async` may be used.
