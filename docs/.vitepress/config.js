@@ -473,6 +473,10 @@ export default {
                                                         text: "8.2. Using GLib",
                                                         link: "/tutorials/programming-language/main/08-00-techniques/08-02-using-glib",
                                                     },
+                                                    {
+                                                        text: "8.3. Unit Testing",
+                                                        link: "/tutorials/programming-language/main/08-00-techniques/08-03-unit-testing",
+                                                    },
                                                 ],
                                             },
                                         ],
@@ -1612,6 +1616,14 @@ export default {
                                     {
                                         text: "Lua embedding",
                                         link: "/sample-code/other/lua-sample",
+                                    },
+                                    {
+                                        text: "NTP client (Posix UDP)",
+                                        link: "/sample-code/other/ntp-client-sample",
+                                    },
+                                    {
+                                        text: "Weather HTTP client (GIO)",
+                                        link: "/sample-code/other/weather-http-client-sample",
                                     },
                                     {
                                         text: "TIFF",
